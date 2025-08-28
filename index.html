@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parcelamento de Produto</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        input, button {
+            padding: 10px;
+            margin: 5px;
+            font-size: 16px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .resultado {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Parcelamento de Produto</h1>
+        <label for="valorProduto">Valor do Produto (R$):</label>
+        <input type="number" id="valorProduto" value="100" step="0.01">
+        <label for="parcelas">Número de Parcelas:</label>
+        <input type="number" id="parcelas" value="1" min="1" max="12">
+        <button onclick="calcularParcelas()">Calcular Parcelas</button>
+
+        <div class="resultado" id="resultado"></div>
+    </div>
+
+    <script>
+        function calcularParcelas() {
+            const valorProduto = parseFloat(document.getElementById('valorProduto').value);
+            const numParcelas = parseInt(document.getElementById('parcelas').value);
+            const taxaJuros = 0.0299; // 2.99% ao mês
+
+            // Verifica se o valor do produto ou número de parcelas são válidos
+            if (isNaN(valorProduto) || isNaN(numParcelas) || numParcelas < 1 || numParcelas > 12) {
+                alert("Por favor, insira valores válidos.");
+                return;
+            }
+
+            // Calcula o valor da parcela com juros apenas se forem 2 ou mais parcelas
+            let parcela;
+            let totalPago;
+
+            if (numParcelas === 1) {
+                // Sem juros para 1 parcela
+                parcela = valorProduto;
+                totalPago = valorProduto;
+            } else {
+                // Com juros para 2 ou mais parcelas
+                parcela = (valorProduto * taxaJuros * Math.pow(1 + taxaJuros, numParcelas)) / (Math.pow(1 + taxaJuros, numParcelas) - 1);
+                totalPago = parcela * numParcelas;
+            }
+
+            // Exibe o resultado
+            document.getElementById('resultado').innerHTML = `
+                Valor da Parcela em ${numParcelas}x: R$${parcela.toFixed(2)} <br>
+                Total a ser pago: R$${totalPago.toFixed(2)}
+            `;
+        }
+    </script>
+
+</body>
+</html>
