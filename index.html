@@ -1,101 +1,134 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Parcelamento de Produto</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background-color: #f0f0f0;
-        }
-        .container {
-            background-color: white;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            text-align: center;
-            max-width: 400px;
-            width: 100%;
-        }
-        h1 {
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-        input, button {
-            padding: 10px;
-            margin: 5px;
-            font-size: 16px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-        }
-        button {
-            background-color: #007BFF;
-            color: white;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .resultado {
-            margin-top: 20px;
-            font-size: 18px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulador para Clientes</title>
+  <style>
+    body {
+      background-color: #F0F0F0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+    h1 {
+      font-size: 20px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .resultado {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background: #fafafa;
+      display: none;
+    }
+    .resultado p {
+      margin: 6px 0;
+    }
+  </style>
 </head>
 <body>
+  <div class="container">
+    <h1>Simule seu Pagamento</h1>
+    <label for="valor">Valor da Venda (R$):</label>
+    <input type="number" id="valor" value="100">
 
-    <div class="container">
-        <h1>Parcelamento de Produto</h1>
-        <label for="valorProduto">Valor do Produto (R$):</label>
-        <input type="number" id="valorProduto" value="100" step="0.01">
-        <label for="parcelas">Número de Parcelas:</label>
-        <input type="number" id="parcelas" value="1" min="1" max="12">
-        <button onclick="calcularParcelas()">Calcular Parcelas</button>
+    <label for="parcelas">Número de Parcelas:</label>
+    <select id="parcelas"></select>
 
-        <div class="resultado" id="resultado"></div>
-    </div>
+    <button onclick="calcular()">Calcular</button>
 
-    <script>
-        function calcularParcelas() {
-            const valorProduto = parseFloat(document.getElementById('valorProduto').value);
-            const numParcelas = parseInt(document.getElementById('parcelas').value);
-            const taxaJuros = 0.0299; // 2.99% ao mês
+    <div class="resultado" id="resultado"></div>
+  </div>
 
-            // Verifica se o valor do produto ou número de parcelas são válidos
-            if (isNaN(valorProduto) || isNaN(numParcelas) || numParcelas < 1 || numParcelas > 12) {
-                alert("Por favor, insira valores válidos.");
-                return;
-            }
+  <script>
+    const taxasParcelas = {
+      1: 0.00,
+      2: 4.32,
+      3: 5.70,
+      4: 7.05,
+      5: 8.38,
+      6: 9.68,
+      7: 10.96,
+      8: 12.22,
+      9: 13.46,
+      10: 14.65,
+      11: 15.84,
+      12: 17.00,
+    };
 
-            // Calcula o valor da parcela com juros apenas se forem 2 ou mais parcelas
-            let parcela;
-            let totalPago;
+    const taxaIntermediacao = 5.59; // % fixa
 
-            if (numParcelas === 1) {
-                // Sem juros para 1 parcela
-                parcela = valorProduto;
-                totalPago = valorProduto;
-            } else {
-                // Com juros para 2 ou mais parcelas
-                parcela = (valorProduto * taxaJuros * Math.pow(1 + taxaJuros, numParcelas)) / (Math.pow(1 + taxaJuros, numParcelas) - 1);
-                totalPago = parcela * numParcelas;
-            }
+    const selectParcelas = document.getElementById("parcelas");
+    for (let p in taxasParcelas) {
+      let option = document.createElement("option");
+      option.value = p;
+      option.textContent = p + "x";
+      selectParcelas.appendChild(option);
+    }
 
-            // Exibe o resultado
-            document.getElementById('resultado').innerHTML = `
-                Valor da Parcela em ${numParcelas}x: R$${parcela.toFixed(2)} <br>
-                Total a ser pago: R$${totalPago.toFixed(2)}
-            `;
-        }
-    </script>
+    function calcular() {
+      const valor = parseFloat(document.getElementById("valor").value) || 0;
+      const parcelas = parseInt(document.getElementById("parcelas").value);
+      let valorCliente, valorParcela;
 
+      if (parcelas === 1) {
+        valorCliente = valor;
+        valorParcela = valor;
+      } else {
+        const taxaParcela = taxasParcelas[parcelas] || 0;
+        const taxaAcumulada = taxaIntermediacao + taxaParcela;
+        valorCliente = valor / (1 - taxaAcumulada / 100);
+        valorParcela = valorCliente / parcelas;
+      }
+
+      const resultado = `
+        <p><strong>Valor da Parcela em ${parcelas}x:</strong> R$ ${valorParcela.toFixed(2)}</p>
+        <p><strong>Total a ser pago:</strong> R$ ${valorCliente.toFixed(2)}</p>
+      `;
+
+      const resultadoDiv = document.getElementById("resultado");
+      resultadoDiv.innerHTML = resultado;
+      resultadoDiv.style.display = "block";
+    }
+  </script>
 </body>
 </html>
